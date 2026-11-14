@@ -28,6 +28,7 @@ internal sealed class SettingsViewModel : ObservableObject, IPage
         Providers =
         [
             new Choice("Bing, then Esri where Bing has no picture (recommended)", "bing,esri"),
+            new Choice("Esri (ArcGIS), then Bing where Esri has no picture", "esri,bing"),
             new Choice("Bing only", "bing"),
             new Choice("Geoportal in Poland (national orthophoto), Bing and Esri elsewhere", "geoportal,bing,esri"),
         ];

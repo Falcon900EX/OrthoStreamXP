@@ -51,14 +51,23 @@ internal sealed class AppUpdates
     /// <summary>The GitHub Release page of a version.</summary>
     public static string ReleasePage(string version) => $"{Repository}/releases/tag/v{version}";
 
-    /// <summary>Looks for a newer version and downloads it; true when one became ready. Problems (offline, GitHub busy) are only logged.</summary>
-    public async Task<bool> CheckAsync()
+    /// <summary>A look for a new version (and its download) is under way.</summary>
+    public bool IsChecking => _checking;
+
+    /// <summary>Looks for a newer version and downloads it. Problems (offline, GitHub busy) are only logged.</summary>
+    public async Task<UpdateCheck> CheckAsync()
     {
-        if (_manager is null || _checking || Ready is not null) return false;
+        if (_manager is null) return UpdateCheck.NotInstalled;
+        if (Ready is not null) return UpdateCheck.AlreadyReady;
+        if (_checking) return UpdateCheck.InProgress;
         _checking = true;
         try
         {
-            if (await _manager.CheckForUpdatesAsync().ConfigureAwait(true) is not { } update) return false;
+            if (await _manager.CheckForUpdatesAsync().ConfigureAwait(true) is not { } update)
+            {
+                Log.Info($"OrthoStreamXP {CurrentVersion} is the newest version");
+                return UpdateCheck.UpToDate;
+            }
             Log.Info($"OrthoStreamXP {update.TargetFullRelease.Version} is available (this is {CurrentVersion}); downloading it");
             await _manager.DownloadUpdatesAsync(update).ConfigureAwait(true);
             string? notes = update.TargetFullRelease.NotesMarkdown;
@@ -67,12 +76,12 @@ internal sealed class AppUpdates
                 : notes;
             Ready = update;
             Log.Step($"OrthoStreamXP {ReadyVersion} is downloaded and ready to install");
-            return true;
+            return UpdateCheck.Downloaded;
         }
         catch (Exception ex)
         {
             Log.Info($"Could not look for a new version: {ex.Message}");
-            return false;
+            return UpdateCheck.Failed;
         }
         finally
         {

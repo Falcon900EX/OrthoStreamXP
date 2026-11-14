@@ -3,6 +3,26 @@
              xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
              x:ClassModifier="internal">
     <UserControl.Resources>
+        <!-- Fluent's slider does not look disabled when it is (streaming running, or its setting off): dimmed like the switches -->
+        <Style TargetType="Slider" BasedOn="{StaticResource {x:Type Slider}}">
+            <Style.Triggers>
+                <Trigger Property="IsEnabled" Value="False">
+                    <Setter Property="Opacity" Value="0.4" />
+                </Trigger>
+            </Style.Triggers>
+        </Style>
+        <!-- A slider's value ("100 %", "Off"), greyed with it -->
+        <Style x:Key="SliderValue" TargetType="TextBlock">
+            <Setter Property="Width" Value="80" />
+            <Setter Property="Margin" Value="12,0,0,0" />
+            <Setter Property="VerticalAlignment" Value="Center" />
+            <Style.Triggers>
+                <Trigger Property="IsEnabled" Value="False">
+                    <Setter Property="Foreground" Value="{DynamicResource TextFillColorDisabledBrush}" />
+                </Trigger>
+            </Style.Triggers>
+        </Style>
+
         <!-- A preset card's content -->
         <DataTemplate x:Key="PresetTemplate">
             <RadioButton Style="{StaticResource ChoiceCard}"
@@ -140,7 +160,7 @@
                                 <StackPanel Grid.Column="1" Orientation="Horizontal" VerticalAlignment="Center">
                                     <Slider Width="200" Minimum="0" Maximum="100" TickFrequency="10" IsSnapToTickEnabled="True" VerticalAlignment="Center"
                                             Value="{Binding GroundDetail, Delay=400}" AutomationProperties.Name="Ground detail" />
-                                    <TextBlock Text="{Binding GroundDetailText}" Width="80" Margin="12,0,0,0" VerticalAlignment="Center" />
+                                    <TextBlock Text="{Binding GroundDetailText}" Style="{StaticResource SliderValue}" />
                                 </StackPanel>
                             </Grid>
                         </Border>
@@ -227,7 +247,7 @@
                                 </Grid.ColumnDefinitions>
                                 <StackPanel VerticalAlignment="Center" Margin="0,0,24,0">
                                     <TextBlock Text="Where the pictures come from" />
-                                    <TextBlock Style="{StaticResource Caption}" Margin="0,2,0,0" Text="Bing has the sharpest pictures in most places; Esri fills the gaps." />
+                                    <TextBlock Style="{StaticResource Caption}" Margin="0,2,0,0" Text="Bing has the sharpest pictures in most places; Esri (ArcGIS) can be newer or clearer in some regions. The second one fills the gaps." />
                                 </StackPanel>
                                 <ComboBox Grid.Column="1" Width="300" VerticalAlignment="Center" ItemsSource="{Binding Providers}" DisplayMemberPath="Label"
                                           SelectedItem="{Binding Provider}" AutomationProperties.Name="Where the pictures come from" />
@@ -247,7 +267,7 @@
                                 <StackPanel Grid.Column="1" Orientation="Horizontal" VerticalAlignment="Center">
                                     <Slider Width="200" Minimum="16" Maximum="256" TickFrequency="16" IsSnapToTickEnabled="True" VerticalAlignment="Center"
                                             Value="{Binding DownloadWorkers, Delay=400}" AutomationProperties.Name="Downloads at once" />
-                                    <TextBlock Text="{Binding DownloadWorkersText}" Width="80" Margin="12,0,0,0" VerticalAlignment="Center" />
+                                    <TextBlock Text="{Binding DownloadWorkersText}" Style="{StaticResource SliderValue}" />
                                 </StackPanel>
                             </Grid>
                         </Border>
@@ -353,7 +373,7 @@
                                 <StackPanel Grid.Column="1" Orientation="Horizontal" VerticalAlignment="Center">
                                     <Slider Width="200" Minimum="0" Maximum="100" TickFrequency="10" IsSnapToTickEnabled="True" VerticalAlignment="Center"
                                             Value="{Binding MatchStrength, Delay=400}" AutomationProperties.Name="Colour matching strength" />
-                                    <TextBlock Text="{Binding MatchStrengthText}" Width="80" Margin="12,0,0,0" VerticalAlignment="Center" />
+                                    <TextBlock Text="{Binding MatchStrengthText}" Style="{StaticResource SliderValue}" />
                                 </StackPanel>
                             </Grid>
                         </Border>
@@ -404,7 +424,7 @@
                                 <StackPanel Grid.Column="1" Orientation="Horizontal" VerticalAlignment="Center">
                                     <Slider Width="200" Minimum="0" Maximum="100" TickFrequency="10" IsSnapToTickEnabled="True" VerticalAlignment="Center"
                                             Value="{Binding SeasonStrength, Delay=400}" AutomationProperties.Name="Season strength" />
-                                    <TextBlock Text="{Binding SeasonStrengthText}" Width="80" Margin="12,0,0,0" VerticalAlignment="Center" />
+                                    <TextBlock Text="{Binding SeasonStrengthText}" Style="{StaticResource SliderValue}" />
                                 </StackPanel>
                             </Grid>
                         </Border>
@@ -427,7 +447,7 @@
                                 <StackPanel Grid.Column="1" Orientation="Horizontal" VerticalAlignment="Center">
                                     <Slider Width="200" Minimum="50" Maximum="100" TickFrequency="5" IsSnapToTickEnabled="True" VerticalAlignment="Center"
                                             Value="{Binding Exposure, Delay=400}" AutomationProperties.Name="Exposure" />
-                                    <TextBlock Text="{Binding ExposureText}" Width="80" Margin="12,0,0,0" VerticalAlignment="Center" />
+                                    <TextBlock Text="{Binding ExposureText}" Style="{StaticResource SliderValue}" />
                                 </StackPanel>
                             </Grid>
                         </Border>
