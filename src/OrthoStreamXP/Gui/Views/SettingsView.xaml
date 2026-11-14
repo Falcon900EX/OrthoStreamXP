@@ -227,7 +227,7 @@
                                 </Grid.ColumnDefinitions>
                                 <StackPanel VerticalAlignment="Center" Margin="0,0,24,0">
                                     <TextBlock Text="Where the pictures come from" />
-                                    <TextBlock Style="{StaticResource Caption}" Margin="0,2,0,0" Text="Bing has the sharpest pictures in most places; Esri fills the gaps." />
+                                    <TextBlock Style="{StaticResource Caption}" Margin="0,2,0,0" Text="Bing has the sharpest pictures in most places; Esri (ArcGIS) can be newer or clearer in some regions. The second one fills the gaps." />
                                 </StackPanel>
                                 <ComboBox Grid.Column="1" Width="300" VerticalAlignment="Center" ItemsSource="{Binding Providers}" DisplayMemberPath="Label"
                                           SelectedItem="{Binding Provider}" AutomationProperties.Name="Where the pictures come from" />
