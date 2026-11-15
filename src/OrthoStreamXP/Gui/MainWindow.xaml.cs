@@ -19,6 +19,9 @@ internal sealed partial class MainWindow
         {
             if (new UpdateDialog(offer) { Owner = this }.ShowDialog() == true) _main.Home.InstallConfirmedUpdate();
         };
+        // The Home page's Check for updates button found nothing to install.
+        _main.Home.UpdateCheckReported += (_, message) =>
+            MessageBox.Show(this, message, "OrthoStreamXP", MessageBoxButton.OK, MessageBoxImage.Information);
         var tray = new TrayIcon(this);
         _main.Home.XPlaneStarted += async (_, _) => await HandOverToXPlaneAsync(tray).ConfigureAwait(true);
         // The flight is over: back on the Home page, with Stop and (once stopped) the flight's report.

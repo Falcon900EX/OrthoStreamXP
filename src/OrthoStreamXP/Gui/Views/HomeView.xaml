@@ -53,7 +53,19 @@
 
     <ScrollViewer VerticalScrollBarVisibility="Auto" HorizontalScrollBarVisibility="Disabled">
         <StackPanel Margin="36,28,36,36" MaxWidth="980">
-            <TextBlock Text="Home" Style="{StaticResource PageTitle}" />
+            <Grid>
+                <TextBlock Text="Home" Style="{StaticResource PageTitle}" />
+                <Button Command="{Binding CheckForUpdates}" HorizontalAlignment="Right" VerticalAlignment="Center" Padding="12,4"
+                        ToolTip="Look for a new version of OrthoStreamXP now" AutomationProperties.Name="{Binding CheckForUpdatesText}">
+                    <StackPanel Orientation="Horizontal">
+                        <TextBlock Style="{StaticResource Icon}" Text="&#xE895;" Margin="0,0,8,0" />
+                        <TextBlock Text="{Binding CheckForUpdatesText}" VerticalAlignment="Center" />
+                    </StackPanel>
+                </Button>
+            </Grid>
+
+            <!-- Notices (a new version first among them) above everything else -->
+            <ItemsControl ItemsSource="{Binding Notices}" ItemTemplate="{StaticResource NoticeTemplate}" Focusable="False" Margin="0,8,0,0" />
 
             <!-- What is happening, and the one button that matters -->
             <Border Style="{StaticResource Card}" Padding="24,20" Margin="0,16,0,0">
@@ -112,8 +124,6 @@
                     </StackPanel>
                 </Grid>
             </Border>
-
-            <ItemsControl ItemsSource="{Binding Notices}" ItemTemplate="{StaticResource NoticeTemplate}" Focusable="False" />
 
             <!-- After a flight: what the tuning suggests, to apply or not -->
             <Border Style="{StaticResource Card}" Padding="24,20" Margin="0,16,0,0" Visibility="{Binding ShowReview, Converter={StaticResource Visible}}">

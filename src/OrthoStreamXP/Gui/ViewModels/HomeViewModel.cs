@@ -50,8 +50,9 @@ internal sealed class HomeViewModel : ObservableObject, IPage
         _updateTimer.Tick += async (_, _) =>
         {
             _updateTimer.Interval = TimeSpan.FromHours(6);
-            if (await _updates.CheckAsync().ConfigureAwait(true)) Notices = BuildNotices();
+            if (await _updates.CheckAsync().ConfigureAwait(true) == UpdateCheck.Downloaded) Notices = BuildNotices();
         };
+        CheckForUpdates = new RelayCommand(() => _ = CheckForUpdatesAsync(), () => !_updates.IsChecking);
         _updateTimer.Start();
         Mount.PropertyChanged += (_, e) =>
         {
@@ -113,6 +114,34 @@ internal sealed class HomeViewModel : ObservableObject, IPage
     {
         if (_updates.ReadyVersion is not { } version) return;
         UpdateOffered?.Invoke(this, new UpdateOffer(version, _updates.CurrentVersion, ReleaseNotes.Parse(_updates.ReadyNotes), AppUpdates.ReleasePage(version)));
+    }
+
+    /// <summary>Looks for a new version now: one found is shown as the update notice, otherwise the window says why there is none.</summary>
+    public ICommand CheckForUpdates { get; }
+
+    /// <summary>A look asked for by the person found no update to show (up to date, failed, not installed): the window tells them.</summary>
+    public event EventHandler<string>? UpdateCheckReported;
+
+    public string CheckForUpdatesText => _updates.IsChecking ? "Checking…" : "Check for updates";
+
+    private async Task CheckForUpdatesAsync()
+    {
+        Task<UpdateCheck> check = _updates.CheckAsync();
+        Raise(nameof(CheckForUpdatesText));
+        CommandManager.InvalidateRequerySuggested();
+        UpdateCheck result = await check.ConfigureAwait(true);
+        Raise(nameof(CheckForUpdatesText));
+        CommandManager.InvalidateRequerySuggested();
+        Notices = BuildNotices();
+        string? message = result switch
+        {
+            UpdateCheck.UpToDate => $"No updates are available. You have the newest version of OrthoStreamXP ({_updates.CurrentVersion}).",
+            UpdateCheck.InProgress => "OrthoStreamXP is already looking for a new version. Try again in a moment.",
+            UpdateCheck.Failed => "OrthoStreamXP could not look for a new version. Check your internet connection and try again; the details are in the log.",
+            UpdateCheck.NotInstalled => "No updates are available: this copy of OrthoStreamXP was not installed, so it does not update itself.",
+            _ => null, // Downloaded or already ready: the update notice shows it.
+        };
+        if (message is not null) UpdateCheckReported?.Invoke(this, message);
     }
 
     /// <summary>Installs the downloaded version and restarts, once confirmed; not while the scenery streams.</summary>
@@ -546,6 +575,14 @@ internal sealed class HomeViewModel : ObservableObject, IPage
     private List<Notice> BuildNotices()
     {
         var notices = new List<Notice>();
+        // A new version first: it heads the page.
+        if (_updates.ReadyVersion is { } version)
+            notices.Add(Mount.State == MountState.Stopped
+                ? new Notice(Severity.Info, $"OrthoStreamXP {version} is ready to install",
+                    $"A new version was downloaded (you have {_updates.CurrentVersion}). See what's new and install it when you choose; your settings, cache and flight history stay.",
+                    "Update…", InstallUpdate)
+                : new Notice(Severity.Info, $"OrthoStreamXP {version} is ready to install",
+                    $"A new version was downloaded (you have {_updates.CurrentVersion}). Stop the streaming when you have finished flying, and install it from here."));
         if (Mount.State == MountState.Stopped && !ShowReview)
         {
             if (_tuningNotice is not null) notices.Add(_tuningNotice);
@@ -556,13 +593,6 @@ internal sealed class HomeViewModel : ObservableObject, IPage
                 notices.Add(new Notice(Severity.Success, $"{PresetName(suited.Level)} suits your PC and connection",
                     $"OrthoStreamXP watched {suited.MinutesInFlight:0} minutes of flying and found nothing to tune."));
         }
-        if (_updates.ReadyVersion is { } version)
-            notices.Add(Mount.State == MountState.Stopped
-                ? new Notice(Severity.Info, $"OrthoStreamXP {version} is ready to install",
-                    $"A new version was downloaded (you have {_updates.CurrentVersion}). See what's new and install it when you choose; your settings, cache and flight history stay.",
-                    "Update…", InstallUpdate)
-                : new Notice(Severity.Info, $"OrthoStreamXP {version} is ready to install",
-                    $"A new version was downloaded (you have {_updates.CurrentVersion}). Stop the streaming when you have finished flying, and install it from here."));
         if (_xplaneProblem is not null) notices.Add(_xplaneProblem);
         if (Mount.Problem is { } problem)
             notices.Add(new Notice(Severity.Error, problem.Title, problem.Message, problem.ActionLabel,
