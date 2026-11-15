@@ -1,5 +1,7 @@
 # OrthoStreamXP
 
+![OrthoStreamXP: free, open-source photo scenery for X-Plane 12, streamed as you fly](docs/images/banner.jpg)
+
 **Fly over real-world aerial imagery in X-Plane 12 — without downloading entire regions in advance.**
 
 OrthoStreamXP streams photo scenery as you fly, loading the areas around your aircraft first and keeping downloaded imagery ready for your next flight.
