@@ -79,12 +79,13 @@ The installer is not currently code-signed, so Windows may display a warning tha
 
 ## Choose your scenery quality
 
-OrthoStreamXP provides four presets:
+OrthoStreamXP provides five presets:
 
 - **Balanced** — prioritises a balance between visual detail and resource use.
 - **Sharp** — the recommended starting point for most systems.
 - **Ultra** — for systems with more graphics memory available.
 - **Extra** — the highest preset, intended for systems with greater resources.
+- **Dynamic** — Extra near the ground, Sharp from 5,000 ft and Balanced from 25,000 ft above it. High up, X-Plane still asks for full detail it cannot show, so Dynamic saves about half the downloads in a climb and cruise. On a descent it returns to full detail early, before the ground comes close.
 
 You can change presets in Settings. OrthoStreamXP also reports graphics memory usage from your flights and warns when the measured scenery requirements exceed your card's available memory.
 
