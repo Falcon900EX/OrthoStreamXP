@@ -15,6 +15,7 @@ import errno
 import json
 import logging
 import math
+import select
 import socket
 import struct
 import threading
@@ -32,11 +33,19 @@ RESPONSE_HEADER = struct.Struct("<iI")
 log = logging.getLogger(__name__)
 
 
-def receive_exact(sock: socket.socket, count: int) -> bytes:
+def receive_exact(sock: socket.socket, count: int, closed: threading.Event | None = None) -> bytes:
     data = bytearray(count)
     view = memoryview(data)
     done = 0
     while done < count:
+        if closed is not None and closed.is_set():
+            raise OSError(errno.EIO, "Engine client closed during read")
+        if closed is not None:
+            readable, _, _ = select.select([sock], [], [], 0.05)
+            if not readable:
+                continue
+            if closed.is_set():
+                raise OSError(errno.EIO, "Engine client closed during read")
         n = sock.recv_into(view[done:])
         if not n:
             raise ConnectionError("OrthoStreamXP engine closed its socket")
@@ -58,6 +67,7 @@ class EngineClient:
         self._idle: list[socket.socket] = []
         self._condition = threading.Condition()
         self._closed = False
+        self._close_event = threading.Event()
 
     def _connection(self) -> socket.socket:
         """Borrow exclusively; connect outside the lock so close() can interrupt."""
@@ -134,10 +144,10 @@ class EngineClient:
     def _exchange(self, sock: socket.socket, op: str, fields: dict[str, Any], payload: bytes) -> Any:
         try:
             sock.sendall(REQUEST_HEADER.pack(len(payload)) + payload)
-            error, size = RESPONSE_HEADER.unpack(receive_exact(sock, RESPONSE_HEADER.size))
+            error, size = RESPONSE_HEADER.unpack(receive_exact(sock, RESPONSE_HEADER.size, self._close_event))
             if error < 0 or size > MAX_RESPONSE:
                 raise ValueError("Invalid engine response header")
-            data = receive_exact(sock, size)
+            data = receive_exact(sock, size, self._close_event)
         except (OSError, ConnectionError, ValueError) as exc:
             self._discard(sock)
             raise OSError(errno.EIO, f"OrthoStreamXP engine connection failed: {exc}") from exc
@@ -158,6 +168,7 @@ class EngineClient:
     def close(self) -> None:
         with self._condition:
             self._closed = True
+            self._close_event.set()
             sockets = tuple(self._sockets)
             self._sockets.clear()
             self._idle.clear()
