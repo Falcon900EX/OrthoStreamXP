@@ -114,6 +114,7 @@ internal static partial class SystemMemory
     /// <summary>(total, available) bytes, or null if Windows does not say.</summary>
     public static (long Total, long Available)? Now()
     {
+        if (!OperatingSystem.IsWindows()) return null;
         var status = new MemoryStatusEx { Length = (uint)Marshal.SizeOf<MemoryStatusEx>() };
         return GlobalMemoryStatusEx(ref status) ? ((long)status.TotalPhys, (long)status.AvailPhys) : null;
     }

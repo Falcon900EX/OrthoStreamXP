@@ -1,0 +1,17 @@
+<Project Sdk="Microsoft.NET.Sdk">
+  <PropertyGroup>
+    <TargetFramework>net10.0</TargetFramework>
+    <OutputType>Exe</OutputType>
+    <IsPackable>false</IsPackable>
+    <NoWarn>$(NoWarn);CA1707;CA1515;CA1861</NoWarn>
+  </PropertyGroup>
+  <ItemGroup>
+    <Using Include="Xunit" />
+    <ProjectReference Include="../../src/OrthoStreamXP.Core/OrthoStreamXP.Core.csproj" />
+    <ProjectReference Include="../../src/OrthoStreamXP.Mac/OrthoStreamXP.Mac.csproj" />
+    <Compile Include="../OrthoStreamXP.Tests/ColourMatchTests.cs;../OrthoStreamXP.Tests/DownloadTests.cs;../OrthoStreamXP.Tests/FakeTileServer.cs;../OrthoStreamXP.Tests/ImageryProviderTests.cs;../OrthoStreamXP.Tests/NightLightsTests.cs;../OrthoStreamXP.Tests/PrefetchTests.cs;../OrthoStreamXP.Tests/SceneryOverlayTests.cs;../OrthoStreamXP.Tests/SeasonsTests.cs;../OrthoStreamXP.Tests/StreamingTests.cs;../OrthoStreamXP.Tests/TerrainDefinitionsTests.cs;../OrthoStreamXP.Tests/TestSettings.cs;../OrthoStreamXP.Tests/TextureFormatTests.cs;../OrthoStreamXP.Tests/TextureQualityTests.cs;../OrthoStreamXP.Tests/XPlaneUdpTests.cs;../OrthoStreamXP.Tests/DsfBuilder.cs" LinkBase="Upstream" />
+    <PackageReference Include="Microsoft.NET.Test.Sdk" Version="18.11.0" />
+    <PackageReference Include="xunit.v3" Version="4.0.2" />
+    <PackageReference Include="xunit.runner.visualstudio" Version="4.0.1" PrivateAssets="all" />
+  </ItemGroup>
+</Project>

@@ -8,7 +8,11 @@ namespace OrthoStreamXP.Setup;
 /// </summary>
 internal static class AppPaths
 {
-    public static string Root { get; } = Path.Join(Environment.GetFolderPath(Environment.SpecialFolder.LocalApplicationData), "OrthoStreamXP");
+    public static string Root { get; } = OperatingSystem.IsMacOS()
+        ? Environment.GetEnvironmentVariable("ORTHOSTREAMXP_DATA_HOME") is { Length: > 0 } custom
+            ? Path.GetFullPath(custom)
+            : Path.Join(Environment.GetFolderPath(Environment.SpecialFolder.UserProfile), "Library", "Application Support", "OrthoStreamXP")
+        : Path.Join(Environment.GetFolderPath(Environment.SpecialFolder.LocalApplicationData), "OrthoStreamXP");
 
     /// <summary>The settings file (its tuning and connection test beside it).</summary>
     public static string Settings => Path.Join(Root, SettingsOptions.DefaultSettingsFile);

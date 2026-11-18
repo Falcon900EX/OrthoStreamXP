@@ -1,0 +1,5 @@
+# Same FUSE binding as AutoOrtho Continued 3.1.0; no AutoOrtho runtime is needed.
+# Hashes are the wheel and sdist published on PyPI for this exact version.
+mfusepy==3.1.1 \
+    --hash=sha256:69fb70cfc7f7cce595e6ff586f8451d8298f01f18286a157f24f564b24ec5a37 \
+    --hash=sha256:338ece54513d7d1a5e9492837679a0c7432ecf96a03490a2683a1ce1d19570e1

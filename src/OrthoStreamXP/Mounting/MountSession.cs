@@ -1,4 +1,3 @@
-using Fsp;
 using OrthoStreamXP.Scenery;
 using OrthoStreamXP.Setup;
 using OrthoStreamXP.Textures;
@@ -10,9 +9,10 @@ namespace OrthoStreamXP;
 /// A running mount: every package of <see cref="MountSettings"/> mounted with its cache overlay, build
 /// scheduler and load-ahead, the shared downloader and encoder, and the aircraft position listener.
 /// </summary>
-internal sealed class MountSession : IDisposable
+internal sealed partial class MountSession : IDisposable
 {
     private readonly MountSettings _settings;
+    private readonly IMountHostFactory _hostFactory;
     private readonly List<PackageMount> _mounts = [];
     private readonly CancellationTokenSource _summaries = new();
     private readonly ViewTracker _view = new();
@@ -35,9 +35,10 @@ internal sealed class MountSession : IDisposable
     private Task? _summaryLoop, _sampleLoop;
     private bool _stopped;
 
-    private MountSession(MountSettings settings)
+    private MountSession(MountSettings settings, IMountHostFactory hostFactory)
     {
         _settings = settings;
+        _hostFactory = hostFactory;
         _loads = new SceneryLoads(_view);
         _daylight = new Daylight(-settings.SkipPhotosSunBelow);
     }
@@ -54,9 +55,9 @@ internal sealed class MountSession : IDisposable
     /// Mounts every package and starts building. On failure everything already mounted is unmounted again
     /// before the exception is passed on.
     /// </summary>
-    public static MountSession Start(MountSettings settings)
+    public static MountSession Start(MountSettings settings, IMountHostFactory hostFactory)
     {
-        var session = new MountSession(settings);
+        var session = new MountSession(settings, hostFactory);
         try
         {
             session.StartAll();
@@ -69,7 +70,10 @@ internal sealed class MountSession : IDisposable
         }
     }
 
-    private void StartAll()
+    // The Mac CLI retains this session during partial startup so busy mounts can be retried.
+    public static MountSession Create(MountSettings settings, IMountHostFactory factory) => new(settings, factory);
+
+    public void StartAll()
     {
         MountSettings s = _settings;
         foreach (string folder in s.NotPackages) Log.Info($"Skipping {folder}: not a scenery package (it has no Earth nav data folder)");
@@ -156,7 +160,7 @@ internal sealed class MountSession : IDisposable
             roots.RenameToCacheNames();
             _mounts.Add(new PackageMount(package, roots, builder, textureOptions, s.TrackAircraft, s.LoadAhead, s.LazyTerrainListing, decals,
                 streaming ? new TextureStreamer(roots, builder!, _view, model, streamingOptions, nightPause) : null, _view, _readLog, _seasons, _usage, _colours, _loads, exposure,
-                nightPainting is null ? null : new NightTextures(package.Cache, s.Textures.SizeFor, nightPainting)));
+                nightPainting is null ? null : new NightTextures(package.Cache, s.Textures.SizeFor, nightPainting), _hostFactory));
             Log.Info($"Package {package.Name}: read-only from {package.Source}, cache overlay {package.Cache}, mounted at {package.Mountpoint}");
         }
         PrefetchTarget[] targets = [.. _mounts.Where(m => m.Catalog is not null)
@@ -230,9 +234,18 @@ internal sealed class MountSession : IDisposable
     private async Task StopAsync(bool hurry, bool summaries)
     {
         if (_stopped) return;
+        // Do not mark stopped or dispose the engine until every native mount is gone.
+        // A busy macFUSE mount can be retried after the simulator closes.
+        List<Exception> unmountErrors = [];
+        foreach (PackageMount mount in _mounts)
+        {
+            try { mount.Unmount(); }
+            catch (IOException ex) { unmountErrors.Add(ex); }
+        }
+        if (unmountErrors.Count > 0)
+            throw new IOException("One or more mounts are still busy; close X-Plane and retry shutdown.", new AggregateException(unmountErrors));
         _stopped = true;
         await _summaries.CancelAsync().ConfigureAwait(false);
-        foreach (PackageMount mount in _mounts) mount.Unmount();
         _listener?.Stop();
         foreach (PackageMount mount in _mounts)
         {

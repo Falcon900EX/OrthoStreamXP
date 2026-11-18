@@ -51,6 +51,8 @@ internal sealed class SceneryOverlay
         // (some packages have no terrain\ and only _textures\).
         Directory.CreateDirectory(Path.Join(roots.Cache, "terrain"));
         Directory.CreateDirectory(Path.Join(roots.Cache, "textures"));
+        if (night is not null)
+            Directory.CreateDirectory(Path.Join(roots.Cache, NightTextures.Folder));
     }
 
     public TextureStreamer? Streamer => _streamer;

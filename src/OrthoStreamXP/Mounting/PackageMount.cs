@@ -1,4 +1,3 @@
-using Fsp;
 using OrthoStreamXP.Scenery;
 using OrthoStreamXP.Setup;
 using OrthoStreamXP.Textures;
@@ -13,12 +12,12 @@ namespace OrthoStreamXP;
 /// </summary>
 internal sealed class PackageMount : IDisposable
 {
-    private readonly FileSystemHost _host;
+    private readonly IMountHost _host;
     private bool _mounted;
 
     public PackageMount(PackagePlan plan, SceneryRoots roots, TextureBuilder? builder, TextureOptions textureOptions,
         bool trackAircraft, bool loadAhead, bool lazyTerrainListing, TerrainDecals decals, TextureStreamer? streamer, ViewTracker view, ReadLog? readLog,
-        SeasonClock? seasons, AreaUsage? usage, ColourMatcher? colours, SceneryLoads loads, ushort[]? exposure, NightTextures? night)
+        SeasonClock? seasons, AreaUsage? usage, ColourMatcher? colours, SceneryLoads loads, ushort[]? exposure, NightTextures? night, IMountHostFactory hostFactory)
     {
         Plan = plan;
         Streamer = streamer;
@@ -35,7 +34,7 @@ internal sealed class PackageMount : IDisposable
             LoadAhead = Catalog is null || !loadAhead ? null : new LoadAheadPrefetcher(Catalog, Scheduler!, roots, textureOptions.DdsBuildWorkers * 2);
         }
         Overlay = new SceneryOverlay(roots, Scheduler, lazyTerrainListing, Catalog, streamer, decals, night);
-        _host = new FileSystemHost(new SceneryFileSystem(Overlay, "OrthoStreamXP", readLog, plan.Name, seasons, usage, colours, loads, exposure));
+        _host = hostFactory.Create(new MountContext(plan, Overlay, readLog, seasons, usage, colours, loads, exposure));
     }
 
     public PackagePlan Plan { get; }
@@ -48,9 +47,9 @@ internal sealed class PackageMount : IDisposable
 
     public void Mount(int fileSystemThreads)
     {
-        int status = _host.MountEx(Plan.Mountpoint, (uint)fileSystemThreads, null, false, 0);
-        if (status < 0) throw new IOException($"WinFsp could not mount {Plan.Mountpoint} (NTSTATUS 0x{status:X8}); is WinFsp installed?");
+        // A mount can exist even when initialization throws. Keep it in cleanup.
         _mounted = true;
+        _host.Mount(fileSystemThreads);
     }
 
     public void Unmount()

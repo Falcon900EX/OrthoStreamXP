@@ -114,19 +114,7 @@ internal static class SystemCheck
     }
 
     /// <summary>Free space on the drive of a folder (the folder itself need not exist yet).</summary>
-    public static long? FreeBytes(string? folder)
-    {
-        try
-        {
-            return string.IsNullOrWhiteSpace(folder) || Path.GetPathRoot(Path.GetFullPath(folder)) is not { Length: > 0 } root
-                ? null
-                : new DriveInfo(root).AvailableFreeSpace;
-        }
-        catch (Exception ex) when (ex is IOException or ArgumentException or UnauthorizedAccessException)
-        {
-            return null;
-        }
-    }
+    public static long? FreeBytes(string? folder) => DiskSpace.FreeBytes(folder);
 
     /// <summary>
     /// The cache the setup suggests. One folder holds both, by choice not by need:

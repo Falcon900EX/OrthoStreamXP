@@ -87,6 +87,7 @@ internal sealed record GraphicsMemory(DateTime MeasuredUtc, int FlownSize, IRead
     /// </summary>
     public static long? CardBytes()
     {
+        if (!OperatingSystem.IsWindows()) return null;
         try
         {
             using RegistryKey? cards = Registry.LocalMachine.OpenSubKey(@"SYSTEM\CurrentControlSet\Control\Class\{4d36e968-e325-11ce-bfc1-08002be10318}");

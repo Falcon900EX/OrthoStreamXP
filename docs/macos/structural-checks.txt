@@ -1,0 +1,9 @@
+Python AST parse: PASS (10 source files)
+New .NET project/solution XML and referenced source/content paths: PASS (4 files; NOT a C# compile)
+Core linked source selection: PASS (104 files; no duplicate links or direct WPF/WinFsp imports)
+Donor manifest local SHA-256 hashes: PASS (4 files)
+Bash syntax: PASS (build, run, smoke scripts)
+ARM64 CI workflow YAML structure: PASS (not executed)
+Validation environment: Linux x86_64, Python 3.13.5
+.NET build/tests: NOT RUN (SDK absent)
+macFUSE mount/X-Plane flight: NOT RUN (no macOS kernel, driver or simulator)

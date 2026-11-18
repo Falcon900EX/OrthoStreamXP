@@ -1,0 +1,34 @@
+{
+  "project": "AutoOrtho Continued",
+  "tag": "3.1.0",
+  "commit": "9cf46158913c994013250a1844d732249ef49f8e",
+  "checked_date": "2026-11-14",
+  "selection": "latest published release, not develop",
+  "license": "Apache-2.0",
+  "files": [
+    {
+      "local_path": "platform/macos/donor/macos_mounts.py",
+      "upstream_url": "https://raw.githubusercontent.com/ProgrammingDinosaur/autoortho4xplane/9cf46158913c994013250a1844d732249ef49f8e/autoortho/utils/macos_mounts.py",
+      "relationship": "implementation retained; header/whitespace adjusted",
+      "local_sha256": "df13b2218324716e37b4b2b0f46c731efc1d9cab862b51c37598f242f4d27102"
+    },
+    {
+      "local_path": "platform/macos/donor/mac_lifecycle.py",
+      "upstream_url": "https://raw.githubusercontent.com/ProgrammingDinosaur/autoortho4xplane/9cf46158913c994013250a1844d732249ef49f8e/autoortho/macsetup.py",
+      "relationship": "adapted unmount_macfuse",
+      "local_sha256": "69e41e0feb5398fc390c3d15a32961a904a5d489a724448188a86263493d5cfa"
+    },
+    {
+      "local_path": "platform/macos/mount_worker.py",
+      "upstream_url": "https://raw.githubusercontent.com/ProgrammingDinosaur/autoortho4xplane/9cf46158913c994013250a1844d732249ef49f8e/autoortho/mount_worker.py",
+      "relationship": "adapted lifecycle design; new IPC worker",
+      "local_sha256": "ee413b3d565abb24fac11a2c84600ff3a774f42b606f2fe48a1a35e5b8a26c13"
+    },
+    {
+      "local_path": "platform/macos/macfuse_runtime.py",
+      "upstream_url": "https://raw.githubusercontent.com/ProgrammingDinosaur/autoortho4xplane/9cf46158913c994013250a1844d732249ef49f8e/autoortho/autoortho_fuse.py",
+      "relationship": "adapted Darwin mount options",
+      "local_sha256": "7d901a9f3a5572c95c5747c05115223ed6175ea1a25acc2840d0836605261ff2"
+    }
+  ]
+}

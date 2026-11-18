@@ -94,7 +94,7 @@ public sealed class ImageryProviderTests
         await tiles.GetTileAsync(wroclawX, wroclawY, 16, priority: false, new TileStats());
         await tiles.GetTileAsync(parisX, parisY, 16, priority: false, new TileStats());
 
-        Assert.Equal(["t" + (wroclawX + wroclawY) % 8 + ".test", "fallback.test"], server.Requests.Select(u => u.Host));
+        Assert.Equal(["t" + (wroclawX + wroclawY) % 4 + ".test", "fallback.test"], server.Requests.Select(u => u.Host));
     }
 
     [Fact]

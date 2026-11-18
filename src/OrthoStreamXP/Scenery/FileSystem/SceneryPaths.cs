@@ -36,7 +36,7 @@ internal sealed class VirtualPath
     {
         string[] parts = fileName.Split(['\\', '/'], StringSplitOptions.RemoveEmptyEntries);
         foreach (string part in parts)
-            if (part is "." or ".." || part.Contains(':')) throw new NtStatusException(NtStatus.AccessDenied);
+            if (part is "." or ".." || part.Contains(':') || part.Contains('\0')) throw new NtStatusException(NtStatus.AccessDenied);
         return new VirtualPath(parts);
     }
 
@@ -87,7 +87,7 @@ internal sealed class SceneryRoots
     /// <summary>The existing file or directory at <paramref name="parts"/> under <paramref name="root"/>, or null.</summary>
     public static string? Find(string root, IEnumerable<string> parts)
     {
-        string candidate = Path.Join(root, string.Join('\\', parts));
+        string candidate = Path.Join(root, string.Join(Path.DirectorySeparatorChar, parts));
         return File.Exists(candidate) || Directory.Exists(candidate) ? candidate : null;
     }
 
@@ -97,8 +97,8 @@ internal sealed class SceneryRoots
     /// <summary>The source package's real folders behind a virtual directory (several for the textures tree).</summary>
     public IEnumerable<string> SourceFolders(VirtualPath path) =>
         IsTexturesTree(path)
-            ? SourceTextureFolders.Select(folder => Path.Join(Source, folder, string.Join('\\', path.Parts[1..])))
-            : [Path.Join(Source, string.Join('\\', path.Parts))];
+            ? SourceTextureFolders.Select(folder => Path.Join(Source, folder, string.Join(Path.DirectorySeparatorChar, path.Parts[1..])))
+            : [Path.Join(Source, string.Join(Path.DirectorySeparatorChar, path.Parts))];
 
     /// <summary>
     /// The existing source file or directory behind a virtual path, looking in textures\ then _textures\.
@@ -122,7 +122,7 @@ internal sealed class SceneryRoots
     public string CachePath(VirtualPath path) =>
         PhotoTexture(path) is { } name
             ? Path.Join(Cache, "textures", Textures.CacheStem(name) + ".dds")
-            : Path.Join(Cache, string.Join('\\', path.Parts));
+            : Path.Join(Cache, string.Join(Path.DirectorySeparatorChar, path.Parts));
 
     /// <summary>The level chain file of a photo texture: .xpstream\mips\43760_71720_PX17.mip2.</summary>
     public string ChainPath(TextureName name, int level) =>
@@ -131,7 +131,7 @@ internal sealed class SceneryRoots
     private static TextureName? PhotoTexture(VirtualPath path) =>
         path.Parts.Length == 2 && path.IsDds && TextureName.TryParseFile(path.Name, out TextureName name) ? name : null;
 
-    public string ProvisionalPath(VirtualPath path) => Path.Join(Cache, ".xpstream", "provisional", string.Join('\\', path.Parts));
+    public string ProvisionalPath(VirtualPath path) => Path.Join(Cache, ".xpstream", "provisional", string.Join(Path.DirectorySeparatorChar, path.Parts));
 
     /// <summary>The existing cached file or directory behind a virtual path, or null.</summary>
     public string? FindCached(VirtualPath path)

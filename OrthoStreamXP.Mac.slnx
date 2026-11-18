@@ -1,0 +1,5 @@
+<Solution>
+  <Project Path="src/OrthoStreamXP.Core/OrthoStreamXP.Core.csproj" />
+  <Project Path="src/OrthoStreamXP.Mac/OrthoStreamXP.Mac.csproj" />
+  <Project Path="tests/OrthoStreamXP.Core.Tests/OrthoStreamXP.Core.Tests.csproj" />
+</Solution>

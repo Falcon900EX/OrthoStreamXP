@@ -36,7 +36,7 @@ public sealed class DownloadTests : IDisposable
         var server = new FakeTileServer(status: _ => HttpStatusCode.ServiceUnavailable);
         using var tiles = new TileSource("test", FakeTileServer.Template, 4, attempts: 3, handler: server);
         await Assert.ThrowsAsync<IOException>(() => tiles.GetTileAsync(1, 2, 3, false, new TileStats()));
-        Assert.Equal(["t3.test", "t4.test", "t5.test"], server.Requests.Select(u => u.Host)); // (x + y + attempt) % 8
+        Assert.Equal(["t3.test", "t0.test", "t1.test"], server.Requests.Select(u => u.Host)); // (x + y + attempt) % 4
     }
 
     [Fact]

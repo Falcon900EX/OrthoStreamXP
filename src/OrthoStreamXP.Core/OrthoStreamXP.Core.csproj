@@ -1,0 +1,22 @@
+<Project Sdk="Microsoft.NET.Sdk">
+  <PropertyGroup>
+    <TargetFramework>net10.0</TargetFramework>
+    <AllowUnsafeBlocks>true</AllowUnsafeBlocks>
+    <RootNamespace>OrthoStreamXP</RootNamespace>
+  </PropertyGroup>
+  <ItemGroup>
+    <Compile Include="../OrthoStreamXP/Configuration/**/*.cs" LinkBase="Configuration" />
+    <Compile Include="../OrthoStreamXP/Infrastructure/**/*.cs" LinkBase="Infrastructure" />
+    <Compile Include="../OrthoStreamXP/Mounting/**/*.cs" Exclude="../OrthoStreamXP/Mounting/WindowsMountSession.cs;../OrthoStreamXP/Mounting/WinFspMountHost.cs" LinkBase="Mounting" />
+    <Compile Include="../OrthoStreamXP/Scenery/**/*.cs" Exclude="../OrthoStreamXP/Scenery/FileSystem/SceneryFileSystem.cs" LinkBase="Scenery" />
+    <Compile Include="../OrthoStreamXP/Textures/**/*.cs" LinkBase="Textures" />
+    <Compile Include="../OrthoStreamXP/Tuning/**/*.cs" LinkBase="Tuning" />
+    <Compile Include="../OrthoStreamXP/Setup/Cache/**/*.cs" LinkBase="Setup/Cache" />
+    <Compile Include="../OrthoStreamXP/Setup/Settings/**/*.cs" LinkBase="Setup/Settings" />
+    <Compile Include="../OrthoStreamXP/Setup/Packages/**/*.cs" LinkBase="Setup/Packages" />
+    <Compile Include="../OrthoStreamXP/Setup/Installation/AppPaths.cs;../OrthoStreamXP/Setup/Installation/LegacyNames.cs;../OrthoStreamXP/Setup/Installation/DiskSpace.cs;../OrthoStreamXP/Setup/Installation/GithubReleaseNotes.cs" LinkBase="Setup/Installation" />
+    <PackageReference Include="SkiaSharp" Version="4.153.1" />
+    <InternalsVisibleTo Include="OrthoStreamXP.Mac" />
+    <InternalsVisibleTo Include="OrthoStreamXP.Core.Tests" />
+  </ItemGroup>
+</Project>

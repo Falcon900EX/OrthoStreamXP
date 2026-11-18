@@ -8,3 +8,14 @@ artifacts/
 TestResults/
 .vscode
 site/
+
+# macOS development outputs
+.venv-macos/
+__pycache__/
+*.pyc
+.DS_Store
+artifacts/
+
+# Local macOS development backups
+.orthostreamxp-backups/
+*.before-*.bak

@@ -291,7 +291,7 @@ internal sealed class RegionInstaller(AssetDownload download, string packagesFol
     /// <param name="extraZip">A zip that may be on the disk beside the one being unpacked.</param>
     private void CheckSpace(long toDownload, long extraZip)
     {
-        if (SystemCheck.FreeBytes(PackagesFolder) is not { } free) return;
+        if (DiskSpace.FreeBytes(PackagesFolder) is not { } free) return;
         long needed = (long)(toDownload * UnpackedRatio) + extraZip + SpareBytes;
         if (free < needed)
             throw new InstallException($"Not enough disk space: the install needs about {CacheInventory.FormatBytes(needed)} " +

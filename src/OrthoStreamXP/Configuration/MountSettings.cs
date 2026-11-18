@@ -81,7 +81,7 @@ internal sealed record MountSettings
 
     /// <summary>Reads and checks the mount options; a mistake is a <see cref="SettingsException"/> in plain words.</summary>
     /// <param name="console">False for the window: the log never goes to a console there.</param>
-    public static MountSettings FromValues(SettingValues values, bool console = true)
+    public static MountSettings FromValues(SettingValues values, bool console = true, bool validateMountpoints = true, bool migrateLegacy = true, bool allowSourceInCustomScenery = false)
     {
         string cache = Path.TrimEndingDirectorySeparator(Path.GetFullPath(values.Required("cache")));
         int levelChange = values.Int("level-change", 0);
@@ -91,15 +91,15 @@ internal sealed record MountSettings
         // One cache folder for every setup: each texture plan keeps its files in its own subfolder.
         string planCache = Path.Join(cache, texturePlan.FolderName);
         // The regions an earlier version installed take their new names before the packages are listed (nothing is mounted yet).
-        Setup.LegacyPackageNames.Move(values.String("base-packages"), cache, values.String("xplane"));
-        IReadOnlyList<PackagePlan> packages = PlanPackages(values, planCache, out string? customScenery, out IReadOnlyList<string> notPackages);
+        if (migrateLegacy) Setup.LegacyPackageNames.Move(values.String("base-packages"), cache, values.String("xplane"));
+        IReadOnlyList<PackagePlan> packages = PlanPackages(values, planCache, out string? customScenery, out IReadOnlyList<string> notPackages, validateMountpoints, allowSourceInCustomScenery);
         string sceneryPacksValue = values.String("scenery-packs") ?? "on";
         bool updateSceneryPacks = ParseOnOff(sceneryPacksValue) ?? throw new SettingsException($"scenery-packs must be on or off, not '{sceneryPacksValue}'");
         string logValue = values.String("log-output") ?? "both";
         LogOutput logOutput = Log.ParseOutput(logValue)
             ?? throw new SettingsException($"log-output must be none, console, log-file or both, not '{logValue}'");
         if (!console) logOutput &= ~LogOutput.Console;
-        Setup.LegacyNames.MoveCache(cache, Setup.AppPaths.Logs, Setup.AppPaths.History); // before the log and the cache are opened
+        if (migrateLegacy) Setup.LegacyNames.MoveCache(cache, Setup.AppPaths.Logs, Setup.AppPaths.History); // before the log and the cache are opened
         // One log per session in the app's logs folder (the last ones kept, see Log.Configure), unless a file is named.
         string logPath = values.String("log-file") is { } logFile
             ? Path.GetFullPath(logFile)
@@ -231,7 +231,7 @@ internal sealed record MountSettings
     /// </summary>
     /// <param name="customScenery">X-Plane's Custom Scenery folder when xplane is given.</param>
     /// <param name="notPackages">Subfolders of base-packages that are not scenery packages.</param>
-    internal static IReadOnlyList<PackagePlan> PlanPackages(SettingValues values, string cache, out string? customScenery, out IReadOnlyList<string> notPackages)
+    internal static IReadOnlyList<PackagePlan> PlanPackages(SettingValues values, string cache, out string? customScenery, out IReadOnlyList<string> notPackages, bool validateMountpoints = true, bool allowSourceInCustomScenery = false)
     {
         string? source = FullPath(values.String("source"));
         string? basePackages = FullPath(values.String("base-packages"));
@@ -247,7 +247,7 @@ internal sealed record MountSettings
         customScenery = xplane is null ? null : Path.Join(xplane, "Custom Scenery");
         if (customScenery is not null && !Directory.Exists(customScenery))
             throw new SettingsException($"Not an X-Plane folder (it has no Custom Scenery folder): {xplane}");
-        if (xplane is not null && (source ?? basePackages) is { } packages && SceneryPacks.IsInCustomScenery(packages, xplane))
+        if (!allowSourceInCustomScenery && xplane is not null && (source ?? basePackages) is { } packages && SceneryPacks.IsInCustomScenery(packages, xplane))
             throw new SettingsException($"{InCustomScenery}: {packages}");
         notPackages = [];
         List<PackagePlan> plan;
@@ -275,10 +275,10 @@ internal sealed record MountSettings
             string? parent = Path.GetDirectoryName(package.Mountpoint);
             if (parent is null || !Directory.Exists(parent))
                 throw new SettingsException($"Parent directory for mount point must exist: {parent}");
-            if (Path.Exists(package.Mountpoint))
+            if (validateMountpoints && Path.Exists(package.Mountpoint))
                 throw new SettingsException($"Mount point path must not already exist; WinFsp creates it while mounted: {package.Mountpoint}" +
                                          (customScenery is null ? "" : " (Custom Scenery already has a folder of that name: remove or rename it)"));
-            if (SamePath(package.Mountpoint, package.Source) || SamePath(package.Mountpoint, package.Cache) || SamePath(package.Mountpoint, cache))
+            if (validateMountpoints && (SamePath(package.Mountpoint, package.Source) || SamePath(package.Mountpoint, package.Cache) || SamePath(package.Mountpoint, cache)))
                 throw new SettingsException("Mount point must differ from both source and cache directories");
         }
         return plan;

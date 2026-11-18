@@ -23,7 +23,7 @@ internal sealed record ImageryProvider(string Name, string Template)
     /// <summary>The providers known by name; any other name takes its template from --texture-url (--url).</summary>
     public static readonly IReadOnlyDictionary<string, string> BuiltIn = new Dictionary<string, string>(StringComparer.OrdinalIgnoreCase)
     {
-        ["bing"] = "https://ecn.t{s}.tiles.virtualearth.net/tiles/a{q}.jpeg?g=1",
+        ["bing"] = "https://t{s}.ssl.ak.tiles.virtualearth.net/tiles/a{q}.jpeg?g=15312",
         ["esri"] = "https://server.arcgisonline.com/ArcGIS/rest/services/World_Imagery/MapServer/tile/{z}/{y}/{x}",
         // Poland's national orthophoto (GUGiK, free to use), on the web-map grid up to zoom 19.
         ["geoportal"] = "https://mapy.geoportal.gov.pl/wss/service/PZGIK/ORTO/WMTS/StandardResolution?SERVICE=WMTS&REQUEST=GetTile&VERSION=1.0.0" +
@@ -218,8 +218,8 @@ internal sealed class TileSource : IDisposable
         for (int p = 0; p < _providers.Count; p++)
         {
             string template = _providers[p].Template;
-            int hosts = template.Contains("{s}", StringComparison.Ordinal) ? 8 : 1;
-            int perHost = p == 0 ? Math.Clamp(DownloadWorkers / 8, 1, 8) : 1;
+            int hosts = template.Contains("{s}", StringComparison.Ordinal) ? 4 : 1;
+            int perHost = p == 0 ? Math.Clamp(DownloadWorkers / 4, 1, 8) : 1;
             for (int i = 0; i < hosts * perHost; i++) urls.Add(Url(template, 0, 0, 1, i % hosts));
         }
         await Parallel.ForEachAsync(urls, new ParallelOptions { MaxDegreeOfParallelism = 32 }, async (url, ct) =>
@@ -332,7 +332,7 @@ internal sealed class TileSource : IDisposable
                 for (int attempt = 0; attempt < _attempts; attempt++)
                 {
                     // Each retry asks the next server, so one stuck host or connection is not retried.
-                    string url = Url(provider.Template, x, y, zoom, (x + y + attempt) % 8);
+                    string url = Url(provider.Template, x, y, zoom, (x + y + attempt) % 4);
                     long started = Stopwatch.GetTimestamp();
                     try
                     {

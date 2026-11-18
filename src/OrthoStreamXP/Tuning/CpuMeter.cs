@@ -12,7 +12,7 @@ internal static partial class SystemCpu
     private static partial bool GetSystemTimes(out long idle, out long kernel, out long user);
 
     /// <summary>(idle, total) so far, or null if Windows does not say.</summary>
-    public static (long Idle, long Total)? Now() => GetSystemTimes(out long idle, out long kernel, out long user) ? (idle, kernel + user) : null;
+    public static (long Idle, long Total)? Now() => OperatingSystem.IsWindows() && GetSystemTimes(out long idle, out long kernel, out long user) ? (idle, kernel + user) : null;
 }
 
 /// <summary>
@@ -86,7 +86,7 @@ internal sealed class CpuMeter
         }
         int fullCollections = GC.CollectionCount(2), since = fullCollections - Interlocked.Exchange(ref _fullCollections, fullCollections);
         return $"Load over the last {period.TotalMinutes:0.#} min (share of all {Environment.ProcessorCount} logical processors): OrthoStreamXP CPU {process}, " +
-               $"all of Windows {windows}; memory: {Memory(GC.GetGCMemoryInfo(), Environment.WorkingSet)}, " +
+               $"system CPU {windows}; memory: {Memory(GC.GetGCMemoryInfo(), Environment.WorkingSet)}, " +
                $"{since} full garbage collection{(since == 1 ? "" : "s")}";
     }
 

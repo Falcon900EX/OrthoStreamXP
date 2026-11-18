@@ -1,0 +1,58 @@
+test_busy_mount_returns_false (test_bridge.LifecycleTests.test_busy_mount_returns_false) ... ok
+test_darwin_cached_table_abi_layout (test_bridge.LifecycleTests.test_darwin_cached_table_abi_layout) ... ok
+test_direct_io_is_only_opt_in (test_bridge.LifecycleTests.test_direct_io_is_only_opt_in) ... ok
+test_explicit_force (test_bridge.LifecycleTests.test_explicit_force) ... ok
+test_fuse_options_are_readonly_and_do_not_allow_other_users (test_bridge.LifecycleTests.test_fuse_options_are_readonly_and_do_not_allow_other_users) ... ok
+test_normal_stop_does_not_force (test_bridge.LifecycleTests.test_normal_stop_does_not_force) ... ok
+test_rosetta_and_other_platforms_rejected (test_bridge.LifecycleTests.test_rosetta_and_other_platforms_rejected) ... ok
+test_timeout_never_waits_unboundedly_and_prevents_stacking_helpers (test_bridge.LifecycleTests.test_timeout_never_waits_unboundedly_and_prevents_stacking_helpers) ... Unmount timed out for /tmp/osxp-test-mount; keeping the FUSE worker alive
+Unmount helper still blocked for /tmp/osxp-test-mount; leaving worker alive
+ok
+test_unmounted_is_success_without_helper (test_bridge.LifecycleTests.test_unmounted_is_success_without_helper) ... ok
+test_wrong_identity_refused (test_bridge.LifecycleTests.test_wrong_identity_refused) ... ok
+test_any_mounted_volume_cannot_be_placeholder (test_bridge.MountPathTests.test_any_mounted_volume_cannot_be_placeholder) ... ok
+test_cache_symlink_overlap_rejected (test_bridge.MountPathTests.test_cache_symlink_overlap_rejected) ... ok
+test_case_only_overlap_rejected (test_bridge.MountPathTests.test_case_only_overlap_rejected) ... ok
+test_marker_does_not_authorize_deleting_files (test_bridge.MountPathTests.test_marker_does_not_authorize_deleting_files) ... ok
+test_mount_table_failure_is_not_treated_as_empty (test_bridge.MountPathTests.test_mount_table_failure_is_not_treated_as_empty) ... ok
+test_mounted_path_rejected_before_realpath (test_bridge.MountPathTests.test_mounted_path_rejected_before_realpath) ... ok
+test_nested_cache_rejected (test_bridge.MountPathTests.test_nested_cache_rejected) ... ok
+test_nonempty_mount_preserved (test_bridge.MountPathTests.test_nonempty_mount_preserved) ... ok
+test_nonpackage_rejected (test_bridge.MountPathTests.test_nonpackage_rejected) ... ok
+test_parent_of_active_mount_rejected (test_bridge.MountPathTests.test_parent_of_active_mount_rejected) ... ok
+test_placeholder_round_trip (test_bridge.MountPathTests.test_placeholder_round_trip) ... ok
+test_symlink_mount_rejected (test_bridge.MountPathTests.test_symlink_mount_rejected) ... ok
+test_symlinked_parent_returns_canonical_paths (test_bridge.MountPathTests.test_symlinked_parent_returns_canonical_paths) ... ok
+test_valid_separate_paths (test_bridge.MountPathTests.test_valid_separate_paths) ... ok
+test_access_checks_execution (test_bridge.OperationsTests.test_access_checks_execution) ... ok
+test_directory_pagination (test_bridge.OperationsTests.test_directory_pagination) ... ok
+test_empty_nonfinal_page_does_not_loop (test_bridge.OperationsTests.test_empty_nonfinal_page_does_not_loop) ... ok
+test_every_mutation_is_readonly (test_bridge.OperationsTests.test_every_mutation_is_readonly) ... ok
+test_handle_stat_uses_open_handle (test_bridge.OperationsTests.test_handle_stat_uses_open_handle) ... ok
+test_large_read_is_split_with_correct_offsets (test_bridge.OperationsTests.test_large_read_is_split_with_correct_offsets) ... ok
+test_negative_ranges_rejected (test_bridge.OperationsTests.test_negative_ranges_rejected) ... ok
+test_open_readonly_passes_handle (test_bridge.OperationsTests.test_open_readonly_passes_handle) ... ok
+test_readonly_permissions_and_ownership (test_bridge.OperationsTests.test_readonly_permissions_and_ownership) ... ok
+test_ready_callback (test_bridge.OperationsTests.test_ready_callback) ... ok
+test_release_and_directory_release (test_bridge.OperationsTests.test_release_and_directory_release) ... ok
+test_short_read_is_eof (test_bridge.OperationsTests.test_short_read_is_eof) ... ok
+test_write_flags_rejected (test_bridge.OperationsTests.test_write_flags_rejected) ... ok
+test_zero_read_never_calls_engine (test_bridge.OperationsTests.test_zero_read_never_calls_engine) ... ok
+test_absent_engine_maps_to_io_error (test_bridge.RpcTests.test_absent_engine_maps_to_io_error) ... ok
+test_binary_read_not_json (test_bridge.RpcTests.test_binary_read_not_json) ... ok
+test_close_prevents_reconnect (test_bridge.RpcTests.test_close_prevents_reconnect) ... ok
+test_concurrent_callbacks_have_independent_connections (test_bridge.RpcTests.test_concurrent_callbacks_have_independent_connections) ... ok
+test_connection_loss_is_not_replayed (test_bridge.RpcTests.test_connection_loss_is_not_replayed) ... ok
+test_errno_is_preserved (test_bridge.RpcTests.test_errno_is_preserved) ... ok
+test_fragmented_metadata_and_unicode (test_bridge.RpcTests.test_fragmented_metadata_and_unicode) ... ok
+test_longer_than_requested_read_rejected (test_bridge.RpcTests.test_longer_than_requested_read_rejected) ... ok
+test_malformed_metadata_rejected (test_bridge.RpcTests.test_malformed_metadata_rejected) ... ok
+test_negative_errno_rejected (test_bridge.RpcTests.test_negative_errno_rejected) ... ok
+test_oversized_request_rejected_locally (test_bridge.RpcTests.test_oversized_request_rejected_locally) ... ok
+test_oversized_response_rejected_before_payload (test_bridge.RpcTests.test_oversized_response_rejected_before_payload) ... ok
+test_reuses_connection_for_same_thread (test_bridge.RpcTests.test_reuses_connection_for_same_thread) ... ok
+
+----------------------------------------------------------------------
+Ran 51 tests in 1.242s
+
+OK

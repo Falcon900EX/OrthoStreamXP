@@ -1,3 +1,7 @@
+> **Apple Silicon development port:** see [README-macOS.md](README-macOS.md).
+> Source implementation; native build, macFUSE and flight validation are pending.
+> The original Windows README follows.
+
 # OrthoStreamXP
 
 **Fly over real-world aerial imagery in X-Plane 12 — without downloading entire regions in advance.**
